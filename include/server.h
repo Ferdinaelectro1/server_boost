@@ -12,6 +12,7 @@ using boost::asio::ip::tcp;
           Server();
           void on_handle(std::function<void()> func);
           void begin();
+          void send(const std::string &msg);
           ~Server();
 
         private:

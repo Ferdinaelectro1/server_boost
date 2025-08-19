@@ -64,3 +64,8 @@ void Server::on_handle(std::function<void()> func)
 {
     _user_func = std::make_shared<std::function<void()>>(func);
 }
+
+void send(const std::string &msg)
+{
+    
+}
