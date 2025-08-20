@@ -5,6 +5,8 @@ Server::Server() : _acceptor(_io,tcp::endpoint(tcp::v4(),1234)),_socket(_io)
     //fonction qui serait appelé pour gérer une connexion
     _handle_client = std::make_shared<std::function<void(const boost::system::error_code&)>>();
     _user_func = nullptr;
+    _user_on_receive_callback = nullptr;
+    _read_buffer = std::make_shared<std::array<char,1024>>();
 }
 
 Server::~Server()
@@ -27,9 +29,7 @@ void Server::begin()
             _restart_acceptor();
         };
         _acceptor.async_accept([&](const boost::system::error_code& error, tcp::socket socket){
-                std::cout << "passé 1\n";
                 _socket = std::move(socket);
-                std::cout << "passé 2\n";
                 (*_handle_client)(error);
         });
         if(_user_func == nullptr)
@@ -74,4 +74,24 @@ void Server::send(const std::string &msg)
             std::cout << "Message envoyé !" << std::endl;
         }
     );    
+}
+
+//Fonction qui lit une chaine envoyé par le client
+void Server::on_receive(std::function<void(std::string&)> callback)
+{
+    _user_on_receive_callback = callback;
+    do_read = [&](){_socket.async_read_some(
+        boost::asio::buffer(*_read_buffer),[&](const boost::system::error_code& ec, std::size_t bytes_transferred) mutable {
+            if(!ec)
+            {
+                std::string data_receive(_read_buffer->data(),bytes_transferred); 
+                if(_user_on_receive_callback != nullptr)
+                   _user_on_receive_callback(data_receive);
+                do_read();
+                //std::cout << "Reçu du client : "<<data_receive << std::endl;*/
+            }
+        }
+      );
+    };
+    do_read();
 }

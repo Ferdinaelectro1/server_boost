@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "array": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -13,7 +14,6 @@
         "cwchar": "cpp",
         "cwctype": "cpp",
         "any": "cpp",
-        "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
         "charconv": "cpp",
