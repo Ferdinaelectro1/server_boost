@@ -18,8 +18,9 @@ using boost::asio::ip::tcp;
         private:
           boost::asio::io_context _io;
           tcp::acceptor _acceptor;
-          std::shared_ptr<std::function<void(tcp::socket,const boost::system::error_code&)>> _handle_client;
+          std::shared_ptr<std::function<void(const boost::system::error_code&)>> _handle_client;
           std::shared_ptr<std::function<void()>> _user_func;
+          tcp::socket _socket;
           void _restart_acceptor();
     };
 

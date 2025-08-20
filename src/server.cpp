@@ -1,28 +1,10 @@
 #include "../include/server.h"
 
-Server::Server() : _acceptor(_io,tcp::endpoint(tcp::v4(),1234))
+Server::Server() : _acceptor(_io,tcp::endpoint(tcp::v4(),1234)),_socket(_io)
 {
     //fonction qui serait appelé pour gérer une connexion
-    _handle_client = std::make_shared<std::function<void(tcp::socket,const boost::system::error_code&)>>();
+    _handle_client = std::make_shared<std::function<void(const boost::system::error_code&)>>();
     _user_func = nullptr;
-    *_handle_client = [&](tcp::socket socket,const boost::system::error_code& error) {
-        if(!error)
-        {
-            std::cout << "Client connecté" << std::endl;
-            std::shared_ptr socket_ptr = std::make_shared<tcp::socket>(std::move(socket));
-            std::shared_ptr msg = std::make_shared<std::string>();
-            *msg = "Salut depuis boost.asio\n";
-            boost::asio::async_write(
-                *socket_ptr,boost::asio::buffer(*msg),
-                [&](const boost::system::error_code& ec,std::size_t) mutable {
-                if(!ec)
-                    std::cout << "Message envoyé !" << std::endl;
-                    (*_user_func)();
-                }
-            );   
-        }
-        _restart_acceptor();
-    };
 }
 
 Server::~Server()
@@ -30,12 +12,25 @@ Server::~Server()
     _io.stop();
 }
 
+//**********Démarrer le serveur************************ */
 void Server::begin()
 {
     try
     {
+        //init de la fonction handleclient
+        *_handle_client = [&](const boost::system::error_code& error) {
+            if(!error)
+            {
+                std::cout << "Client connecté" << std::endl;
+                (*_user_func)();
+            }
+            _restart_acceptor();
+        };
         _acceptor.async_accept([&](const boost::system::error_code& error, tcp::socket socket){
-                (*_handle_client)(std::move(socket),error);
+                std::cout << "passé 1\n";
+                _socket = std::move(socket);
+                std::cout << "passé 2\n";
+                (*_handle_client)(error);
         });
         if(_user_func == nullptr)
         {
@@ -53,19 +48,30 @@ void Server::begin()
     
 }
 
+/*************Redémarrer acceptor*******************************/
 void Server::_restart_acceptor()
 {
     _acceptor.async_accept([&](const boost::system::error_code& error, tcp::socket socket){
-            (*_handle_client)(std::move(socket),error);
+            _socket = std::move(socket);
+            (*_handle_client)(error);
     });   
 }
 
+/*************** Fonction de handle d'un client**************** */
 void Server::on_handle(std::function<void()> func)
 {
     _user_func = std::make_shared<std::function<void()>>(func);
 }
 
-void send(const std::string &msg)
+/******Envoyer une donnée au client qui s'est connecté**********/
+void Server::send(const std::string &msg)
 {
-    
+    auto buffer = std::make_shared<std::string>(msg);
+    boost::asio::async_write(
+        _socket,boost::asio::buffer(*buffer),
+        [&](const boost::system::error_code& ec,std::size_t) mutable {
+        if(!ec)
+            std::cout << "Message envoyé !" << std::endl;
+        }
+    );    
 }
