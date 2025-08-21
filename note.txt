@@ -1,1 +1,3 @@
 Aujourd'hui nous allons créer un server c++ avec boost.asio et qui affiche le message que l'utilisateur saisi
+
+- Si le client à qui on envoie le message, n'est pas encore connecté on doit garder le message dans le serveur

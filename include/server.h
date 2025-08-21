@@ -23,7 +23,7 @@ using boost::asio::ip::tcp;
         private:
           boost::asio::io_context _io;
           tcp::acceptor _acceptor;
-          std::shared_ptr<std::function<void()>> _user_client_handle;
+          std::unordered_map<int,std::shared_ptr<std::function<void()>>> _user_client_handle;
           std::function<void(std::string&)> _user_on_receive_callback;
           std::unordered_map<int,std::shared_ptr<Session>> _sessions;
           void _restart_acceptor();

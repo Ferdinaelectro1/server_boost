@@ -18,7 +18,8 @@ class Session
     private: 
       std::function<void(std::string&)> _receive_callback;
       tcp::socket _socket;
-      std::shared_ptr<std::array<char,1024>> _buffer;
+      std::shared_ptr<std::array<char,1024>> _read_buffer;
+      std::shared_ptr<std::string> _write_buffer;
       void _do_read();
       
 };
