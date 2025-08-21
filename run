@@ -2,5 +2,6 @@
 cd build
 cmake ..
 make
+echo "execution"
 ./server
 cd ..

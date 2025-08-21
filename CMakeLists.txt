@@ -6,6 +6,7 @@ add_executable(
     ${PROJECT_NAME}
     main.cpp
     src/server.cpp
+    src/session.cpp
 )
 
 #Liens avec les librairies boost
