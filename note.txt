@@ -1,3 +1,5 @@
 Aujourd'hui nous allons créer un server c++ avec boost.asio et qui affiche le message que l'utilisateur saisi
 
+- chaque client qui vient vers le serveur , envoie sont id pour permettre au serveur de le reconnaitre et de reconnaitre sa session
 - Si le client à qui on envoie le message, n'est pas encore connecté on doit garder le message dans le serveur
+- Faire de tels sortes qu'un client puisse envoyer un message spéciale à un client donné
