@@ -26,7 +26,11 @@ using boost::asio::ip::tcp;
           std::unordered_map<int,std::shared_ptr<std::function<void()>>> _user_client_handle;
           std::function<void(std::string&)> _user_on_receive_callback;
           std::unordered_map<int,std::shared_ptr<Session>> _sessions;
-          std::shared_ptr<Session> _work_session; //Session de travail courant , utilisé pour servir un client avant de le donner sa propre session
+
+          //Session de travail courant , utilisé pour servir un client avant de le donner sa propre session
+          //On fait ça pour permettre au serveur de discuter temporairement avec le client afin de récupérer 
+          //son id et une fois le server à son id , il pourrait le donner sa propre session pour gérer
+          std::shared_ptr<Session> _work_session; 
           void _restart_acceptor();
           int _id;
     };

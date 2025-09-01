@@ -39,7 +39,7 @@ void Server::on_handle(std::function<void()> func,int id)
 /*************Redémarrer acceptor*******************************/
 void Server::_restart_acceptor()
 {
-    _acceptor.async_accept([&](const boost::system::error_code& error, tcp::socket socket){
+/*     _acceptor.async_accept([&](const boost::system::error_code& error, tcp::socket socket){
             _sessions[_id] = std::make_shared<Session>(tcp::socket(_io));
             if(_user_client_handle[_id] != nullptr)
             {
@@ -49,7 +49,31 @@ void Server::_restart_acceptor()
             std::cout << "Client : "<<_id<<" connecté"<< std::endl;
             _restart_acceptor();
             _id++;
-    });
+    }); */
+    _acceptor.async_accept([&](const boost::system::error_code& error, tcp::socket socket){
+            _work_session = std::make_shared<Session>(tcp::socket(_io));
+            //handle pour gérer un client qui se connecte
+            //Dans ce handle , on implémente la fonction de réception du message du client, 
+            // en faite le client va envoyé en premier son id, une fois l'id reçu,
+            //on crée crée une session avec pour clé l'id du client 
+            _work_session->user_handle = [&](){
+                _work_session->receive_data_handle([&](const std::string &msg_receive){
+                    int this_client_id = std::stod(msg_receive);
+                    std::cout << "Client ID : "<<this_client_id<<std::endl;
+                    _work_session->send("OK");
+                    _sessions[this_client_id] = std::make_shared<Session>(tcp::socket(_io));
+                    _sessions[this_client_id] = std::move(_work_session);
+                    if(_user_client_handle[this_client_id] != nullptr)
+                    {
+                        _sessions[this_client_id]->user_handle = *_user_client_handle[this_client_id];   
+                    }  
+                    _work_session = nullptr;
+                });
+            };
+           _work_session->server_handle(error,std::move(socket)); 
+            std::cout << "Client : "<<_id<<" connecté"<< std::endl;
+            _restart_acceptor();
+    }); 
 }
 
 

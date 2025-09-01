@@ -20,20 +20,21 @@ void on_reveive_handler_client1(std::string &data)
 
 void handler_client0()
 {
-    server_ptr->on_receive(on_reveive_handler_client0,0);
+    std::cout << "Fait \n";
+    server_ptr->on_receive(on_reveive_handler_client0,324);
 }
 
 void handler_client1()
 {
-    server_ptr->on_receive(on_reveive_handler_client1,1);
+    server_ptr->on_receive(on_reveive_handler_client1,235);
 }
 
 
 int main()
 {
     server_ptr = std::make_shared<Server>();
-    server_ptr->on_handle(handler_client0,0);
-    server_ptr->on_handle(handler_client1,1);
+    server_ptr->on_handle(handler_client0,235);
+    server_ptr->on_handle(handler_client1,324);
     server_ptr->begin();
     return 0;
 }

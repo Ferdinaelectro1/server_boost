@@ -26,6 +26,14 @@ int main() {
         std::cout.write(reply, reply_length);
         std::cout << std::endl;
 
+        if(reply == "OK")
+        {
+        }
+        else
+        {
+            std::cerr << "Le serveur n'a pas accepté votre connexion" << std::endl;
+        }
+
     } catch (std::exception& e) {
         std::cerr << "Exception : " << e.what() << std::endl;
     }
